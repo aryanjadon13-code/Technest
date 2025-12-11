@@ -17,7 +17,7 @@ function Sell() {
   const [error, setError] = useState("");
 
   // Create a ref for the file input to clear its value
-  const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,9 +27,9 @@ function Sell() {
 
     // Simple validation
     if (!title || !price || !description) {
-        setError("Please fill out all required fields.");
-        setLoading(false);
-        return;
+      setError("Please fill out all required fields.");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -49,7 +49,9 @@ function Sell() {
         price: parseFloat(price), // Ensure price is stored as a number
         description,
         imageUrl,
+        sellerUid: auth.currentUser.uid,
         sellerEmail: auth.currentUser.email,
+
         createdAt: serverTimestamp(),
       });
 
@@ -59,7 +61,8 @@ function Sell() {
       setPrice("");
       setDescription("");
       setImage(null);
-      if (fileInputRef.current) { // Clear the file input visually
+      if (fileInputRef.current) {
+        // Clear the file input visually
         fileInputRef.current.value = "";
       }
     } catch (firebaseError) {
@@ -82,7 +85,8 @@ function Sell() {
   // Function to remove the selected image
   const handleRemoveImage = () => {
     setImage(null);
-    if (fileInputRef.current) { // Clear the file input visually
+    if (fileInputRef.current) {
+      // Clear the file input visually
       fileInputRef.current.value = "";
     }
   };
@@ -99,11 +103,23 @@ function Sell() {
           onSubmit={handleSubmit}
           className="bg-white shadow-2xl rounded-2xl p-6 sm:p-10 md:p-12 w-full max-w-md my-12"
         >
-          
           <div className="flex flex-col items-center mb-8">
             <div className="p-3 mb-4 bg-indigo-100 rounded-full">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600">
-                <path d="M7.7 20c.34-.44.75-.82 1.2-1.12C9.4 18.5 10.5 18 12 18s2.6.5 3.1 1.08c.45.3.86.68 1.2 1.12"/><path d="m19 12-4 4h-5l-4-4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7Z"/><path d="M12 18v6"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-indigo-600"
+              >
+                <path d="M7.7 20c.34-.44.75-.82 1.2-1.12C9.4 18.5 10.5 18 12 18s2.6.5 3.1 1.08c.45.3.86.68 1.2 1.12" />
+                <path d="m19 12-4 4h-5l-4-4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7Z" />
+                <path d="M12 18v6" />
               </svg>
             </div>
             <h2 className="text-3xl font-extrabold text-gray-900 select-none tracking-tight">
@@ -128,7 +144,9 @@ function Sell() {
 
           {/* Title */}
           <div className="mb-5">
-            <label htmlFor="title-input" className={labelClass}>Product Title</label>
+            <label htmlFor="title-input" className={labelClass}>
+              Product Title
+            </label>
             <input
               id="title-input"
               type="text"
@@ -141,7 +159,9 @@ function Sell() {
 
           {/* Category */}
           <div className="mb-5">
-            <label htmlFor="category-select" className={labelClass}>Category</label>
+            <label htmlFor="category-select" className={labelClass}>
+              Category
+            </label>
             <select
               id="category-select"
               value={category}
@@ -157,7 +177,9 @@ function Sell() {
 
           {/* Price */}
           <div className="mb-5">
-            <label htmlFor="price-input" className={labelClass}>Price (₹)</label>
+            <label htmlFor="price-input" className={labelClass}>
+              Price (₹)
+            </label>
             <input
               id="price-input"
               type="number"
@@ -170,7 +192,9 @@ function Sell() {
 
           {/* Description */}
           <div className="mb-5">
-            <label htmlFor="description-textarea" className={labelClass}>Description</label>
+            <label htmlFor="description-textarea" className={labelClass}>
+              Description
+            </label>
             <textarea
               id="description-textarea"
               value={description}
@@ -192,14 +216,30 @@ function Sell() {
             />
             {image && ( // Conditionally render image name and remove button
               <div className="flex items-center mt-2 text-sm text-gray-700">
-                <span className="truncate max-w-[calc(100%-30px)]">{image.name}</span>
+                <span className="truncate max-w-[calc(100%-30px)]">
+                  {image.name}
+                </span>
                 <button
                   type="button"
                   onClick={handleRemoveImage} // Use the new handler
                   className="ml-2 p-1 rounded-full text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500"
                   aria-label="Remove image"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-x"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
                 </button>
               </div>
             )}

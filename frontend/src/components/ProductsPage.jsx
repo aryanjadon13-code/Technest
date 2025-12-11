@@ -64,6 +64,7 @@ const ProductsPage = () => {
                   <div className="flex space-x-3">
                     {/* View Details */}
                     <Link to={`/product/${item.id}`} className="w-1/2">
+                  
                       <button className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition">
                         Details
                       </button>

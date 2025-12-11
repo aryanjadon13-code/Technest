@@ -11,6 +11,8 @@ import ProductsPage from "./components/ProductsPage";
 import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import UserProfile from "./pages/UserProfile";
 import ProductDetails from "./components/ProductDetails";
+import ChatPage from "./components/ChatPage";
+
 function App() {
   return (
     <div>
@@ -26,12 +28,21 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/chat/:productId"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route
           path="/profile"
           element={
             <ProtectedRoute>
-              <UserProfile/>
+              <UserProfile />
             </ProtectedRoute>
           }
         />
