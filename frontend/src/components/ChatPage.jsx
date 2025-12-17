@@ -24,6 +24,7 @@ function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
+  const initializedRef = useRef(false);
 
   // Smooth scroll to bottom on new message
   const scrollToBottom = () => {
@@ -43,67 +44,113 @@ function ChatPage() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-700 text-lg">
-          Please log in to access chat.
-        </p>
+        <p className="text-gray-700 text-lg">Please log in to access chat.</p>
       </div>
     );
   }
 
   // --- CHAT INITIALIZATION ---
+  // useEffect(() => {
+  //   const init = async () => {
+  //     try {
+  //       // 1️⃣ Fetch product
+  //       const productRef = doc(db, "products", productId);
+  //       const snap = await getDoc(productRef);
+
+  //       if (!snap.exists()) {
+  //         console.error("❌ Product not found");
+  //         return;
+  //       }
+
+  //       const p = snap.data();
+  //       setProduct({ id: snap.id, ...p });
+
+  //       // 2️⃣ Build a stable chatId
+  //       const buyerUid = user.uid;
+  //       const sellerUid = p.sellerId; // MUST be stored in Sell.jsx
+
+  //       const id = `${productId}__${sellerUid}__${buyerUid}`;
+  //       setChatId(id);
+
+  //       // 3️⃣ Create chat doc if not exists
+  //       const chatRef = doc(db, "chats", id);
+  //       const chatSnap = await getDoc(chatRef);
+
+  //       if (!chatSnap.exists()) {
+  //         await setDoc(chatRef, {
+  //           productId,
+  //           productTitle: p.title,
+  //           buyerUid,
+  //           buyerEmail: user.email,
+  //           sellerUid,
+  //           sellerEmail: p.sellerEmail,
+  //           createdAt: serverTimestamp(),
+  //           lastMessage: "",
+  //           lastMessageAt: serverTimestamp(),
+  //         });
+  //       }
+
+  //       // 4️⃣ Listen for messages
+  //       const msgRef = collection(db, "chats", id, "messages");
+  //       const q = query(msgRef, orderBy("createdAt", "asc"));
+
+  //       const unsub = onSnapshot(q, (snapshot) => {
+  //         const msgs = snapshot.docs.map((d) => ({
+  //           id: d.id,
+  //           ...d.data(),
+  //         }));
+  //         setMessages(msgs);
+  //       });
+
+  //       return () => unsub();
+  //     } catch (err) {
+  //       console.error("🔥 Chat initialization error:", err);
+  //     }
+  //   };
+
+  //   init();
+  // }, [productId, user]);
+
   useEffect(() => {
+    if (!user || initializedRef.current) return;
+    initializedRef.current = true;
+
     const init = async () => {
       try {
-        // 1️⃣ Fetch product
         const productRef = doc(db, "products", productId);
         const snap = await getDoc(productRef);
 
-        if (!snap.exists()) {
-          console.error("❌ Product not found");
-          return;
-        }
+        if (!snap.exists()) return;
 
         const p = snap.data();
         setProduct({ id: snap.id, ...p });
 
-        // 2️⃣ Build a stable chatId
         const buyerUid = user.uid;
-        const sellerUid = p.sellerUid; // MUST be stored in Sell.jsx
+        const sellerUid = p.sellerId; // ✅ fixed
 
         const id = `${productId}__${sellerUid}__${buyerUid}`;
         setChatId(id);
 
-        // 3️⃣ Create chat doc if not exists
         const chatRef = doc(db, "chats", id);
         const chatSnap = await getDoc(chatRef);
 
         if (!chatSnap.exists()) {
           await setDoc(chatRef, {
             productId,
-            productTitle: p.title,
             buyerUid,
-            buyerEmail: user.email,
             sellerUid,
+            buyerEmail: user.email,
             sellerEmail: p.sellerEmail,
             createdAt: serverTimestamp(),
-            lastMessage: "",
-            lastMessageAt: serverTimestamp(),
           });
         }
 
-        // 4️⃣ Listen for messages
         const msgRef = collection(db, "chats", id, "messages");
         const q = query(msgRef, orderBy("createdAt", "asc"));
 
-        const unsub = onSnapshot(q, (snapshot) => {
-          const msgs = snapshot.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-          }));
-          setMessages(msgs);
+        onSnapshot(q, (snapshot) => {
+          setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
         });
-
-        return () => unsub();
       } catch (err) {
         console.error("🔥 Chat initialization error:", err);
       }
@@ -149,14 +196,11 @@ function ChatPage() {
       <Header />
 
       <div className="flex-1 max-w-4xl w-full mx-auto px-4 py-4 flex flex-col">
-
         {/* Chat Header */}
         <div className="bg-white shadow rounded-lg px-4 py-3 mb-4">
           <h2 className="text-lg font-semibold">
             Chat about:
-            <span className="text-indigo-600 ml-2">
-              {product?.title}
-            </span>
+            <span className="text-indigo-600 ml-2">{product?.title}</span>
           </h2>
           <p className="text-sm text-gray-600">
             Seller: {product?.sellerEmail}
