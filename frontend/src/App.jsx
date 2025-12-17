@@ -12,6 +12,7 @@ import ForgotPasswordPage from "./components/ForgotPasswordPage";
 import UserProfile from "./pages/UserProfile";
 import ProductDetails from "./components/ProductDetails";
 import ChatPage from "./components/ChatPage";
+import Cart from "./components/Cart";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         />
 
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/cart" element={<Cart />} />
         <Route
           path="/profile"
           element={

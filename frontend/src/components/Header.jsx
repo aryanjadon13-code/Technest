@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Logo from "../assets/logo.png";
 import Button from "./Button";
-import { Menu, X, UserCircle } from "lucide-react";
+import { Menu, X, UserCircle, ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../Firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useCart } from "../context/CartContext";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const { cartCount } = useCart();
 
   // Listen to Firebase auth state
   useEffect(() => {
@@ -49,6 +51,9 @@ function Header() {
           <Link to="/sell">
             <li className="hover:text-gray-600 transition">Sell</li>
           </Link>
+          <Link to="/buy">
+            <li className="hover:text-gray-600 transition">Buy</li>
+          </Link>
           <Link to="/aboutus">
             <li className="hover:text-gray-600 transition">About Us</li>
           </Link>
@@ -70,34 +75,50 @@ function Header() {
               </Link>
             </>
           ) : (
-            <div className="relative">
-              {/* User Icon */}
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition"
-              >
-                <UserCircle size={28} className="text-blue-700" />
-              </button>
+            <>
+              <Link to="/cart" className="relative">
+                <li className="hover:text-gray-600 transition flex items-center">
+                  <ShoppingCart size={20} className="mr-1" />
+                  Cart
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </li>
+              </Link>
 
-              {/* Dropdown Menu */}
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg">
-                  <Link
-                    to="/profile"
-                    onClick={() => setDropdownOpen(false)}
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+              <div className="relative">
+
+                {/* User Icon */}
+
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition"
+                >
+                  <UserCircle size={28} className="text-blue-700" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <Link
+                      to="/profile"
+                      onClick={() => setDropdownOpen(false)}
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
 
@@ -124,6 +145,17 @@ function Header() {
             </Link>
             <Link to="/aboutus">
               <li className="hover:text-gray-300">About Us</li>
+            </Link>
+            <Link to="/cart">
+              <li className="hover:text-gray-300 flex items-center">
+                <ShoppingCart size={20} className="mr-2" />
+                Cart
+                {cartCount > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </li>
             </Link>
           </ul>
 
