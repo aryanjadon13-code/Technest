@@ -80,7 +80,8 @@ function Header() {
 
         {/* Desktop Right Section */}
         <div className="hidden md:flex items-center space-x-4 relative">
-          <Link to="/cart" className="relative">
+          {
+            user &&  <Link to="/cart" className="relative">
             <li className="hover:text-gray-600 transition flex items-center">
               <ShoppingCart size={20} className="mr-1" />
               Cart
@@ -91,6 +92,8 @@ function Header() {
               )}
             </li>
           </Link>
+          }
+         
 
           {!user ? (
             <>

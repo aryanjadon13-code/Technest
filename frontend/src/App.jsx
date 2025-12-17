@@ -13,8 +13,10 @@ import UserProfile from "./pages/UserProfile";
 import ProductDetails from "./components/ProductDetails";
 import ChatPage from "./components/ChatPage";
 import Cart from "./components/Cart";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
+  const { user } = useAuth();
   return (
     <div>
       <Routes>
@@ -39,7 +41,7 @@ function App() {
         />
 
         <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/cart" element={<Cart />} />
+        <Route path="/cart" element={user ? <Cart /> : <LoginPage />} />
         <Route
           path="/profile"
           element={
