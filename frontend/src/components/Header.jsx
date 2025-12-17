@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Logo from "../assets/logo.png";
 import Button from "./Button";
 import { Menu, X, UserCircle, ShoppingCart } from "lucide-react";
@@ -13,13 +13,32 @@ function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { cartCount } = useCart();
+  const dropdownRef = useRef(null);
 
   // Listen to Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log(
+        "Auth state changed:",
+        currentUser ? "User logged in" : "No user"
+      );
       setUser(currentUser);
     });
     return () => unsubscribe();
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   // Logout function
@@ -61,6 +80,18 @@ function Header() {
 
         {/* Desktop Right Section */}
         <div className="hidden md:flex items-center space-x-4 relative">
+          <Link to="/cart" className="relative">
+            <li className="hover:text-gray-600 transition flex items-center">
+              <ShoppingCart size={20} className="mr-1" />
+              Cart
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </li>
+          </Link>
+
           {!user ? (
             <>
               <Link to="/login">
@@ -75,50 +106,47 @@ function Header() {
               </Link>
             </>
           ) : (
-            <>
-              <Link to="/cart" className="relative">
-                <li className="hover:text-gray-600 transition flex items-center">
-                  <ShoppingCart size={20} className="mr-1" />
-                  Cart
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </li>
-              </Link>
+            <div className="relative" ref={dropdownRef}>
+              {/* User Icon */}
+              <button
+                onClick={() => {
+                  console.log(
+                    "Dropdown button clicked, current state:",
+                    dropdownOpen
+                  );
+                  setDropdownOpen(!dropdownOpen);
+                }}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition"
+                title="User Menu"
+              >
+                <UserCircle size={28} className="text-blue-700" />
+              </button>
 
-              <div className="relative">
+              {/* Debug info */}
+              {/* <div className="text-xs text-gray-500 mt-1">
+                User:{" "}
+                {user?.email ? user.email.substring(0, 10) + "..." : "None"}
+              </div> */}
 
-                {/* User Icon */}
-
-                <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 transition"
-                >
-                  <UserCircle size={28} className="text-blue-700" />
-                </button>
-
-                {/* Dropdown Menu */}
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg">
-                    <Link
-                      to="/profile"
-                      onClick={() => setDropdownOpen(false)}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
+              {/* Dropdown Menu */}
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <Link
+                    to="/profile"
+                    onClick={() => setDropdownOpen(false)}
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
